@@ -10,7 +10,7 @@ entity shifter_ror is
         sft_lsr   : in std_logic_vector(31 downto 0);
 
         dout        : out std_logic_vector(31 downto 0);
-        -- cout        : out std_logic;
+        cout        : out std_logic;
 
         vdd         : in bit;
         vss         : in bit
@@ -20,7 +20,7 @@ end shifter_ror;
 architecture behavior of shifter_ror is
     signal left_out : std_logic_vector(31 downto 0);
     signal sft_val, shift_val_left : std_logic_vector(4 downto 0);
-    signal cout : std_logic;
+    signal cout_tmp : std_logic;
 
     component adder5
         port(
@@ -37,6 +37,7 @@ architecture behavior of shifter_ror is
             shift_val   : in std_logic_vector(4 downto 0);
             din         : in std_logic_vector(31 downto 0);
             dout        : out std_logic_vector(31 downto 0);
+            cout        : out std_logic;
 
             vdd         : in bit;
             vss         : in bit
@@ -46,9 +47,10 @@ architecture behavior of shifter_ror is
 begin
     shift_val_left <= not(shift_val);
 
-    adder5 : adder5 port map(shift_val_left, "00001", '0', sft_val, cout, vdd, vss);
-    shifter_left : shifter_left port map(sft_val, din, left_out, vdd, vss);
+    adder5 : adder5 port map(shift_val_left, "00001", '0', sft_val, cout_tmp, vdd, vss);
+    shifter_left : shifter_left port map(sft_val, din, left_out, cout_tmp, vdd, vss);
 
+    cout <= cout_tmp;
     dout <= left_out or sft_lsr;
 
 end behavior;

@@ -17,7 +17,7 @@ end shifter_right;
 
 architecture behavior of shifter_right is
     signal sft_16, sft_8, sft_4, sft_2, sft_1 : std_logic_vector(31 downto 0);
-    signal cout_tmp;
+    signal cout_tmp : std_logic;
 
     begin
         cout_tmp <= din(15) when shift_val(4) = '1' else '0';

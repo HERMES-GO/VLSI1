@@ -56,6 +56,7 @@ architecture behavior of shifter is
             shift_val   : in std_logic_vector(4 downto 0);
             din         : in std_logic_vector(31 downto 0);
             dout        : out std_logic_vector(31 downto 0);
+            cout        : out std_logic;
 
             vdd         : in bit;
             vss         : in bit
@@ -66,8 +67,9 @@ architecture behavior of shifter is
         port(
             shift_val   : in std_logic_vector(4 downto 0);
             din         : in std_logic_vector(31 downto 0);
-            sft_lsr   : in std_logic_vector(31 downto 0);
+            sft_lsr     : in std_logic_vector(31 downto 0);
             dout        : out std_logic_vector(31 downto 0);
+            cout        : out std_logic;
 
             vdd         : in bit;
             vss         : in bit
@@ -75,14 +77,14 @@ architecture behavior of shifter is
     end component;
 
     begin
-        LSL : shifter_left port map(shift_val, din, sft_lsl, vdd, vss);
-        LSR : shifter_right port map(shift_val, din, sft_lsr, vdd, vss);
-        ASR : shifter_asr port map(shift_val, din, sft_asr, vdd, vss);
-        ROR : shifter_ror port map(shift_val, din, sft_lsr, sft_ror, vdd, vss);
+        LSL : shifter_left port map(shift_val, din, sft_lsl, carry, vdd, vss);
+        LSR : shifter_right port map(shift_val, din, sft_lsr, carry, vdd, vss);
+        ASR : shifter_asr port map(shift_val, din, sft_asr, carry, vdd, vss);
+        ROR : shifter_ror port map(shift_val, din, sft_lsr, sft_ror, carry, vdd, vss);
 
         sft_rrx <= cin & din(31 downto 1);
-        carry <= din(0);
-        cout <= carry when shif_rrx = '1' else '0';
+        carry <= din(0) when shift_rrx = '1';
+        cout <= carry when shift_rrx = '1';
         dout <= sft_lsl when shift_lsl = '1' else
                 sft_lsr when shift_lsr = '1' else
                 sft_asr when shift_asr = '1' else
