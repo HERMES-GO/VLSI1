@@ -84,7 +84,7 @@ architecture behavior of shifter is
 
         sft_rrx <= cin & din(31 downto 1);
         carry <= din(0) when shift_rrx = '1';
-        cout <= carry when shift_rrx = '1';
+        cout <= carry;
         dout <= sft_lsl when shift_lsl = '1' else
                 sft_lsr when shift_lsr = '1' else
                 sft_asr when shift_asr = '1' else
