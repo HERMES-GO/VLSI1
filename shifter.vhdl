@@ -25,7 +25,7 @@ end Shifter;
 
 architecture behavior of shifter is
     signal sft_lsl, sft_lsr, sft_asr, sft_ror, sft_rrx : std_logic_vector(31 downto 0);
-    signal carry : std_logic;
+    signal cout_lsl, cout_lsr, cout_asr, cout_ror : std_logic;
 
     component shifter_left
         port(
@@ -77,14 +77,19 @@ architecture behavior of shifter is
     end component;
 
     begin
-        LSL : shifter_left port map(shift_val, din, sft_lsl, carry, vdd, vss);
-        LSR : shifter_right port map(shift_val, din, sft_lsr, carry, vdd, vss);
-        ASR : shifter_asr port map(shift_val, din, sft_asr, carry, vdd, vss);
-        ROR : shifter_ror port map(shift_val, din, sft_lsr, sft_ror, carry, vdd, vss);
+        SFTLSL : shifter_left port map(shift_val, din, sft_lsl, cout_lsl, vdd, vss);
+        SFTLSR : shifter_right port map(shift_val, din, sft_lsr, cout_lsr, vdd, vss);
+        SFTASR : shifter_asr port map(shift_val, din, sft_asr, cout_asr, vdd, vss);
+        SFTROR : shifter_ror port map(shift_val, din, sft_lsr, sft_ror, cout_ror, vdd, vss);
 
         sft_rrx <= cin & din(31 downto 1);
-        carry <= din(0) when shift_rrx = '1';
-        cout <= carry;
+
+        cout <= din(0) when shift_rrx = '1' else
+                cout_lsl when shift_lsl = '1' else
+                cout_lsr when shift_lsr = '1' else
+                cout_asr when shift_asr = '1' else
+                cout_ror when shift_ror = '1';
+
         dout <= sft_lsl when shift_lsl = '1' else
                 sft_lsr when shift_lsr = '1' else
                 sft_asr when shift_asr = '1' else

@@ -47,8 +47,8 @@ architecture behavior of shifter_ror is
 begin
     shift_val_left <= not(shift_val);
 
-    adder5 : adder5 port map(shift_val_left, "00001", '0', sft_val, cout_tmp, vdd, vss);
-    shifter_left : shifter_left port map(sft_val, din, left_out, cout_tmp, vdd, vss);
+    add5 : adder5 port map(shift_val_left, "00001", '0', sft_val, cout_tmp, vdd, vss);
+    shift_left : shifter_left port map(sft_val, din, left_out, cout_tmp, vdd, vss);
 
     cout <= cout_tmp;
     dout <= left_out or sft_lsr;

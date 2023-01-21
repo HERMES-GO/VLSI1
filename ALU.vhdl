@@ -29,7 +29,7 @@ architecture dataflow of ALU is
 begin
 	tmp(0) <= cin;
 	boucle: for i in 0 to 31 generate
-		add: entity work.adder port map(op1(i), op2(i), tmp(i), addition(i), tmp(i+1));
+		add: entity work.adder port map(op1(i), op2(i), tmp(i), addition(i), tmp(i+1), vdd, vss);
 	end generate;
 
 	ALU_Result <=	addition		when cmd = "00" else

@@ -82,7 +82,7 @@ architecture Behavior OF EXec is
 	signal cout_alu, cout_sft, v_alu, n_alu, z_alu : std_logic;
 	signal exe_push, exe2mem_full : std_logic;
 
-component alu
+component ALU
     port ( op1			: in Std_Logic_Vector(31 downto 0);
            op2			: in Std_Logic_Vector(31 downto 0);
            cin			: in Std_Logic;
@@ -97,7 +97,7 @@ component alu
 			  
 			  vdd			: in bit;
 			  vss			: in bit);
-end component;
+end component ALU;
 
 component Shifter
 	port(
@@ -117,7 +117,7 @@ component Shifter
         vdd         : in bit;
         vss         : in bit
 	);
-	end component;
+	end component Shifter;
 
 component fifo_72b
 	port(
@@ -137,37 +137,41 @@ component fifo_72b
 		vdd		: in bit;
 		vss		: in bit
 	);
-end component;
+end component fifo_72b;
 
-
+begin
 
 --  Component instantiation.
-	alu_inst : alu
-	port map (		op1_alu  	=> op1,
-					op2_alu 	=> op2,
-					dec_alu_cy  => cin,
-					dec_alu_cmd => cmd,
-					res_alu 	=> res,
-					cout_alu 	=> cout,
-					z_alu		=> z,
-					n_alu 		=> n,
-					v_alu 		=> v,
-					vdd 		=> vdd,
-					vss		 	=> vss);
+	alu_inst : ALU
+	-- port map (		op1_alu  	=> op1,
+	-- 				op2_alu 	=> op2,
+	-- 				dec_alu_cy  => cin,
+	-- 				dec_alu_cmd => cmd,
+	-- 				res_alu 	=> res,
+	-- 				cout_alu 	=> cout,
+	-- 				z_alu		=> z,
+	-- 				n_alu 		=> n,
+	-- 				v_alu 		=> v,
+	-- 				vdd 		=> vdd,
+	-- 				vss		 	=> vss);
+	port map (op1_alu, op2_alu, dec_alu_cy, dec_alu_cmd, res_alu, cout_alu, z_alu, n_alu, v_alu, vdd, vss);
 
 	shifter_inst : Shifter
-	port map (		dec_shift_lsl => shift_lsl,
-					dec_shift_lsr => shift_lsr,
-					dec_shift_asr => shift_asr,
-					dec_shift_ror => shift_ror,
-					dec_shift_rrx => shift_rrx,
-					dec_shift_val => shift_val,
-					dec_op2 	  => din,
-					dec_cy 		  => cin,
-					dout_sft 	  => dout,
-					cout_sft 	  => cout,
-					vdd 		  => vdd,
-					vss 		  => vss);
+	-- port map (		dec_shift_lsl => shift_lsl,
+	-- 				dec_shift_lsr => shift_lsr,
+	-- 				dec_shift_asr => shift_asr,
+	-- 				dec_shift_ror => shift_ror,
+	-- 				dec_shift_rrx => shift_rrx,
+	-- 				dec_shift_val => shift_val,
+	-- 				dec_op2 	  => din,
+	-- 				dec_cy 		  => cin,
+	-- 				dout_sft 	  => dout,
+	-- 				cout_sft 	  => cout,
+	-- 				vdd 		  => vdd,
+	-- 				vss 		  => vss);
+	port map (dec_shift_lsl, dec_shift_lsr, dec_shift_asr, dec_shift_ror,
+				dec_shift_rrx, dec_shift_val, dec_op2, dec_cy, dout_sft,
+				cout_sft, vdd, vss);
 
 	exec2mem : fifo_72b
 	port map (		din(71)	 => dec_mem_lw,

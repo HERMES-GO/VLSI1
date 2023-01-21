@@ -299,7 +299,7 @@ signal alu_dest	: Std_Logic_Vector(3 downto 0);
 signal alu_wb		: Std_Logic;
 signal flag_wb		: Std_Logic;
 
-signal offset32	: Std_Logic_Vector(31 downto 0);
+-- signal offset32	: Std_Logic_Vector(31 downto 0);
 
 -- Decod to mem via exec
 signal mem_data	: Std_Logic_Vector(31 downto 0);
@@ -558,7 +558,6 @@ begin
 
 	ldm_i <= '1' when mtrans_t = '1' and if_ir(20) = '1' else '0';
 	stm_i <= '1' when mtrans_t = '1' and if_ir(20) = '0' else '0';
-	mtrans_regs <= if_ir(15 downto 0) when mtrans_t = '1' else x"0000";
 
 -- branch instruction
 
@@ -570,22 +569,22 @@ begin
 				x"00000000" when (mov_i = '1' or mvn_i = '1') else
 				rdata1;
 
-	offset32 <=	
 
-	op2	<=  rdata2 when (not((if_ir(25) and regop_t) or (not (if_ir(25)) and trans_t)) and (regop_t = '1' or trans_t = '1')) else
-			x"000000" & if_ir(7 downto 0) when (((if_ir(25) and regop_t) or (not (if_ir(25)) and trans_t)) and regop_t = '1') else 
-			x"00000" & if_ir(11 downto 0) when (((if_ir(25) and regop_t) or (not (if_ir(25)) and trans_t)) and trans_t = '1') else 
-			x"0000000" & if_ir(24 downto 0) when b_i = '1' else 
-			x"00000004" when bl_i = '1' else 
+
+	op2	<=  rdata2 when (not ((if_ir(25) and regop_t) or (not (if_ir(25)) and trans_t)) and (regop_t = '1' or trans_t = '1')) else
+			x"000000" & if_ir(7 downto 0) when (((if_ir(25) and regop_t) or (not (if_ir(25)) and trans_t)) and regop_t = '1') else
+			x"00000" & if_ir(11 downto 0) when (((if_ir(25) and regop_t) or (not (if_ir(25)) and trans_t)) and trans_t = '1') else
+			x"0000000" & if_ir(24 downto 0) when b_i = '1' else
+			x"00000004" when bl_i = '1' else
 			x"00000000";
 
-	alu_dest <=	 ..... else
+	alu_dest <=	 x"F" when b_i = '1' or bl_i = '1' else
 					if_ir(19 downto 16);
 
-	alu_wb	<= '1'			when	
-					'0';
+	alu_wb	<= '1'			when	(branch_t or and_i or eor_i or sub_i or rsb_i or add_i or adc_i or sbc_i or rsc_i or orr_i or mov_i or bic_i or mvn_i)
+				else	'0';
 
-	flag_wb	<= 
+	flag_wb	<= '1' when (regop_t and if_ir(20)) else '0';
 
 -- reg read
 	radr1 <= if_ir(19 downto 16);
@@ -596,27 +595,28 @@ begin
 
 -- Reg Invalid
 
-	inval_exe_adr <= ...... else
-							if_ir(15 downto 12);
+	inval_exe_adr <= x"E" when bl_i = '1' else
+					 x"F" when b_i = '1' else
+				     if_ir(15 downto 12);
 
-	inval_exe <=	'1'	when	....
+	inval_exe <=	'1'	when	(alu_wb and cond and condv and dec2exe_push) else
 						'0';
 
-	inval_mem_adr <=	....
+	inval_mem_adr <=	--....
 							mtrans_rd;
 
-	inval_mem <=	'1'	when		....		else
+	inval_mem <=	'1'	when	(mem_wb and cond and condv and dec2exe_push) and (ldr_i or ldrb_i)		else
 						'0';
 
 	inval_czn <=	if_ir(20) and regop_t;
 			
 
-	inval_ovr <=
+	inval_ovr <=	if_ir(20) and regop_t;
 
 -- operand validite
 
-	operv <=	'1' when  ...
-				'0';
+	operv <=	'1'; -- when  ...
+				-- '0';
 
 -- Decode to mem interface 
 	ld_dest <= mem_dest;
@@ -842,6 +842,7 @@ begin
 			next_state <= MTRANS; -- T1
 		else
 			next_state <= RUN; -- T2
+		end if;
 	
 	end case;
 end process;
